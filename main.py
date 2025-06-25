@@ -3,11 +3,14 @@ import matplotlib.pyplot as plt
 
 def main():
     filename = "C:/Users/bailk/Desktop/Monzo Data Export - CSV (Friday, June 20th, 2025).csv"   
-
-    #Formatting dataframe for graphable data
     DF = read_clean_csv(filename) #constant Dataframe
+    df = DF.copy() #mutable copy
 
-    df = remove_category(DF, category='Transfers')
+    prepare_and_plot_daily_balance(df)
+    plt.show()
+
+def prepare_and_plot_daily_balance(df):
+    df = remove_category(df, category='Transfers')
     df = remove_category(df, category='Savings')
 
     #Sums all transactions by date, calculates balance
@@ -16,7 +19,6 @@ def main():
 
     #displays graph
     plot_continuous_graph(df, y_axes=['Balance', 'Amount'], colors=['blue', 'green'])
-    plt.show()
 
 def plot_continuous_graph(df, y_axes = [], colors = [], width = 12, height = 8):
     #Size of graph window in inches before DPI
