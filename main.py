@@ -6,24 +6,28 @@ def main():
     #formatting dataframe for graphable data
     df = read_clean_csv(filename)
     df_no_transfer = remove_category(df, category='Transfers')
-
-    #Adds balance column
-    df_no_transfer = calc_running_Balance(df_no_transfer)
-
-    #Size of graph window in inches before DPI
-    width = 16
-    height = 8
-    plt.figure(figsize=(width, height))
-    
-    plot_continuous_balance_graph(df_no_transfer)
-    plot_continuous_balance_graph(df_no_transfer, 'Amount', 'red')
+    df_no_savings = remove_category(df_no_transfer, category='Savings')
+    print(df_no_savings.to_string())
+    #Adds balance, income, spending column, DAILY
+    df_sum = df_no_savings.groupby('Date')['Amount'].sum().reset_index()
+    df_formatted = calc_running_Balance(df_sum)
+    ### NEED TO FIGURE OUT GOOD NAMING FOR ALL THESE DATAFRAMES
+    df_formatted['Income'] = df_formatted['Amount'].where(df_formatted['Amount'] > 0)
+    df_formatted['Spending'] = df_formatted['Amount'].where(df_formatted['Amount'] < 0)
+    print(df_formatted.to_string())
+    plot_continuous_graph(df_formatted, y_axes=['Balance', 'Amount'], colors=['blue', 'green'])
     plt.show()
 
-def plot_continuous_balance_graph(df, y_axis='Balance', color = 'blue'):
+def plot_continuous_graph(df, y_axes = [], colors = [], width = 12, height = 8):
+    #Size of graph window in inches before DPI
+    plt.figure(figsize=(width, height))
+    for axis, color in zip(y_axes,colors):
+        plot_line(df, y_axis=axis, color=color)
 
+    plt.legend()
 
-    plt.plot(df['Date'], df[y_axis], linewidth=1, color=color)
-
+def plot_line(df, y_axis='Balance', color = 'blue'):
+    plt.plot(df['Date'], df[y_axis], linewidth=1, color=color, label=y_axis)
     plt.title("Continuous Balance Over Time")
     plt.xlabel("Date")
     plt.ylabel(y_axis)
@@ -40,6 +44,7 @@ def remove_category(df, category):
 def calc_running_Balance(df):
     df = df.sort_values(by='Date')
     df['Balance'] = df['Amount'].cumsum()
+    df['Balance'] = round(df['Balance'], 2)
     return df
 
 
@@ -53,8 +58,8 @@ def read_clean_csv(filename):
     df.dropna(inplace=True)  
 
     #Converts Columns to correct type
-    df['Date'] = pd.to_datetime(df['Date'])
-    df['Time'] = pd.to_datetime(df['Time'])
+    df['Date'] = pd.to_datetime(df['Date'], dayfirst=True)
+    df['Time'] = pd.to_datetime(df['Time'], format='%H:%M:%S')
 
     return df
 
