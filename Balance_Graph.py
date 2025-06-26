@@ -1,5 +1,6 @@
 import pandas as pd
 import matplotlib.pyplot as plt
+from utils import *
 
 def main():
     filename = "C:/Users/bailk/Desktop/Monzo Data Export - CSV (Friday, June 20th, 2025).csv"   
@@ -35,33 +36,5 @@ def plot_continuous_graph(df, y_axes = [], colors = [], width = 12, height = 8):
 
 def plot_line(df, y_axis='Balance', color = 'blue'):
     plt.plot(df['Date'], df[y_axis], linewidth=1, color=color, label=y_axis)
-
-def remove_category(df, category):
-    #Removes rows with certain category
-    filtered_df = df[df['Category'] != category].copy()
-    return filtered_df
-
-def calc_running_Balance(df):
-    df = df.sort_values(by='Date')
-    df['Balance'] = df['Amount'].cumsum()
-    df['Balance'] = round(df['Balance'], 2)
-    return df
-
-
-def read_clean_csv(filename):
-    df = pd.read_csv(filename)
-    #Fills NaN with N/A for 'Name' column
-    df['Name'] = df['Name'].fillna('N/A')
-
-    #Drops NaN rows then drops NaN columns
-    df.dropna(axis=1, inplace=True)  
-    df.dropna(inplace=True)  
-
-    #Converts Columns to correct type
-    df['Date'] = pd.to_datetime(df['Date'], dayfirst=True)
-    df['Time'] = pd.to_datetime(df['Time'], format='%H:%M:%S')
-
-    return df
-
 
 main()
