@@ -50,21 +50,23 @@ def calc_running_Balance(df):
     df['Balance'] = round(df['Balance'], 2)
     return df
 
-def remove_category(df, category):
+def remove_categories(df, categories):
     """
     Remove transactions of a specific category from the DataFrame.
     
     Args:
         df (pandas.DataFrame): DataFrame containing transaction data with 'Category' column
-        category (str): Category name to filter out from the data
+        categories (Array[str]): Categories name to filter out from the data
         
     Returns:
         pandas.DataFrame: New DataFrame with specified category removed
         
     Notes:
         - Creates a copy of the filtered DataFrame to avoid modifying original data
-        - Removes all rows where 'Category' column matches the specified category
+        - Removes all rows where 'Category' column matches the specified categories
     """
-    #Removes rows with certain category
-    filtered_df = df[df['Category'] != category].copy()
+    #Removes rows with certain categor
+    filtered_df = df.copy()
+    for category in categories:
+        filtered_df = filtered_df[filtered_df['Category'] != category]
     return filtered_df

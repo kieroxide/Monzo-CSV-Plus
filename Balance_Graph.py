@@ -11,15 +11,15 @@ def main():
     plt.show()
 
 def prepare_and_plot_daily_balance(df):
-    df = remove_category(df, category='Transfers')
-    df = remove_category(df, category='Savings')
+    categories_to_filter = ['Transfers', 'Savings']
+    df_filtered = remove_categories(df, categories_to_filter)
 
     #Sums all transactions by date, calculates balance
-    df = df.groupby('Date')['Amount'].sum().reset_index()
-    df = calc_running_Balance(df)
+    df_daily_sum = df_filtered.groupby('Date')['Amount'].sum().reset_index()
+    df_plot = calc_running_Balance(df_daily_sum)
 
     #displays graph
-    plot_continuous_graph(df, y_axes=['Balance', 'Amount'], colors=['blue', 'green'])
+    plot_continuous_graph(df_plot, y_axes=['Balance', 'Amount'], colors=['blue', 'green'])
 
 def plot_continuous_graph(df, y_axes = [], colors = [], width = 12, height = 8):
     #Size of graph window in inches before DPI
