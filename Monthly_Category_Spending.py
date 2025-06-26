@@ -14,20 +14,29 @@ def main():
     #Creates table of months and category
     pivot_table = monthly_category_sum.unstack(fill_value=0)
     pivot_table = pivot_table.div(pivot_table.sum(axis=1), axis=0) * 100
-    for month, data in pivot_table.iterrows():
-        plot_pie(month, data)
+
+    number_of_pies = 12
+    months_to_plot = pivot_table.tail(number_of_pies) 
+    cols = 3
+    rows = int(number_of_pies / cols)
+    fig, axs = plt.subplots(rows, cols, figsize=(cols*5, rows*5))
+    axs = axs.flatten()
+
+    for i, (month, data) in enumerate(months_to_plot.iterrows()):
+        data = data[data > 5]  
+        data = data.sort_values()
+        axs[i].pie(
+            data,
+            startangle=90,
+            counterclock=False,
+            wedgeprops={'edgecolor': 'white', 'linewidth': 1}
+        )
+        axs[i].set_title(str(month))
+        axs[i].axis('equal')  # keep pie circular
+
+    plt.tight_layout()
+    plt.legend(data.index
+    )
     plt.show()
 
-def plot_pie(month, data):
-    data = data[data > 2.5]  # remove zero categories for clarity
-    plt.figure(figsize=(6,6))
-    plt.pie(
-        data,
-        labels=data.index,
-        autopct='%1.1f%%',
-        startangle=90,
-        counterclock=False,
-        wedgeprops={'edgecolor': 'teal', 'linewidth': 1}
-    )
-    plt.title(f"Spending by Category for {month}")
 main()
