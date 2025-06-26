@@ -70,3 +70,10 @@ def remove_categories(df, categories):
     for category in categories:
         filtered_df = filtered_df[filtered_df['Category'] != category]
     return filtered_df
+
+def convert_to_percentages(category_sum):
+    total_spending = category_sum.sum()
+
+    category_percentages = (category_sum / total_spending) * 100
+    category_percentages = category_percentages[category_percentages > 2.5]
+    return category_percentages

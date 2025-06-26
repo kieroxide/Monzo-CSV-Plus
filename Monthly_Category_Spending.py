@@ -4,14 +4,15 @@ import matplotlib.pyplot as plt
 def main():
     filename = "C:/Users/bailk/Desktop/Monzo Data Export - CSV (Friday, June 20th, 2025).csv"   
     df = read_clean_csv(filename)
-
+    df = remove_categories(df, ['Transfers', 'Savings'])
     spending_df = df[df['Amount'] < 0]
     #Monthly Column
     spending_df['YearMonth'] = spending_df['Date'].dt.to_period('M')
 
     monthly_category_sum = spending_df.groupby(['YearMonth', 'Category'])['Amount'].sum().abs()
-    print(monthly_category_sum)
-    monthly_category_sum.plot(
+    pivot_table = monthly_category_sum.unstack(fill_value=0)
+    
+    pivot_table.plot(
         kind='bar',      # grouped bar chart (stacked=False is default)
         figsize=(12, 6),
         cmap='tab20'     # nice colors for categories

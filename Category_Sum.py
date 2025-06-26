@@ -25,11 +25,8 @@ def format_for_pie(df):
     category_sum = category_sum.abs()
     category_sum = category_sum.sort_values()
 
-    total_spending = category_sum.sum()
+    return convert_to_percentages(category_sum)
 
-    category_percentages = (category_sum / total_spending) * 100
-    category_percentages = category_percentages[category_percentages > 2.5]
-    return category_percentages
 
 def plot_pie(df):
     df.plot(
