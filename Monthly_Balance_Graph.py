@@ -7,17 +7,36 @@ def main():
     DF = read_clean_csv(filename) #constant Dataframe
     df = DF.copy() #mutable copy
 
-    prepare_and_plot_daily_balance(df)
+    prepare_and_plot_monthly_data(df)
     plt.show()
 
-def prepare_and_plot_daily_balance(df):
+def prepare_and_plot_monthly_data(df):
+    #Filter unneeded categories
     categories_to_filter = ['Transfers', 'Savings']
     df_filtered = remove_categories(df, categories_to_filter)
+
+    #Create 3 new dataframes for each type of data
     spending = df_filtered[df_filtered['Amount'] < 0]
     income = df_filtered[df_filtered['Amount'] > 0]
     balance = calc_running_Balance(df_filtered)
 
-    #group by month
+    #Creates monthly series of each datatype and combines into one dataframe
+    combined_monthly = group_monthly_combine(balance, spending, income)
+
+    #Formats datetime column to just be year-month
+    combined_monthly.index = combined_monthly.index.to_period('M')
+    #Plots group Bar chart
+    plot_multibar(combined_monthly)
+    plt.show()
+    
+def plot_multibar(combined_monthly):
+    combined_monthly.plot(
+    kind='bar',
+    figsize=(12, 6),
+    width = 0.8
+    )
+    plt.axhline(color='black')
+def group_monthly_combine(balance, spending, income):
     balance_monthly = balance.groupby(
     pd.Grouper(key='Date', freq='ME')
     )['Amount'].sum()
@@ -35,17 +54,6 @@ def prepare_and_plot_daily_balance(df):
         'Spending' : spending_monthly,
         'Income' : income_monthly
     })
-    combined_monthly.index = combined_monthly.index.to_period('M')
-    combined_monthly.plot(
-    kind='bar',
-    figsize=(12, 6),
-    width = 0.8
-    )
-    plt.axhline(color='black')
-    plt.show()
-    #need to group spending, need to group income, need to group balance, need to group total all monthly
-    
-
-
+    return combined_monthly
 
 main()
